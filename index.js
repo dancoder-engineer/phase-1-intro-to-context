@@ -13,29 +13,71 @@ function createEmployeeRecord(arr) {
 
 function createEmployeeRecords(arr) {
     let objs = []
-    for (i of arr) {
+    for (let i of arr) {
         objs.push(createEmployeeRecord(i))
     }
     return objs
 }
 
-let twoRows = [
-    ["moe", "sizlak", "barkeep", 2],
-    ["bartholomew", "simpson", "scamp", 3]
-  ]
+function createTimeInEvent(obj, timeStamp) {
+    let newObj = {
+        type: "TimeIn",
+        hour: parseInt(timeStamp.slice(11,)),
+        date: timeStamp.slice(0,10)
+    }
+    obj.timeInEvents.push(newObj)
+    return obj
+}
 
-  let dataEmployees = [
-    ["Thor", "Odinsson", "Electrical Engineer", 45],
-    ["Loki", "Laufeysson-Odinsson", "HR Representative", 35],
-    ["Natalia", "Romanov", "CEO", 150],
-    ["Darcey", "Lewis", "Intern", 15],
-    ["Jarvis", "Stark", "CIO", 125],
-    ["Anthony", "Stark", "Angel Investor", 300],
-    ["Byron", "Poodle", "Mascot", 3],
-    ["Julius", "Caesar", "General", 27],
-    ["Rafiki", "", "Aide", 10],
-    ["Simba", "", "King", 100]
-  ]
+function createTimeOutEvent(obj, timeStamp) {
+    let newObj = {
+        type: "TimeOut",
+        hour: parseInt(timeStamp.slice(11,)),
+        date: timeStamp.slice(0,10)
+    }
+    obj.timeOutEvents.push(newObj)
+    return obj
+}
 
-  let employeeRecords = createEmployeeRecords(twoRows)
-  console.log(employeeRecords)
+function hoursWorkedOnDate(obj, timeStamp) {
+    let start = obj.timeInEvents.find(arr => arr.date === (timeStamp))
+    let finish  = obj.timeOutEvents.find(arr => arr.date === (timeStamp))
+    //console.log(typeof(start))
+    return (finish.hour - start.hour) / 100
+}
+
+function wagesEarnedOnDate(obj, timeStamp) {
+    let timeWorked = hoursWorkedOnDate(obj, timeStamp)
+    let rate = obj.payPerHour
+    return timeWorked * rate
+}
+
+
+function allWagesFor(obj) {
+    let datesWorked = []
+    let runningTotal = 0
+    for (let i of obj.timeInEvents) {
+        datesWorked.push(i.date)
+    }
+    //console.log(datesWorked)
+
+    for (let i of datesWorked) {
+        //console.log(i)
+        runningTotal += wagesEarnedOnDate(obj, i)
+    }
+
+    return runningTotal
+
+}
+
+
+
+function calculatePayroll(arr) {
+    let acc = 0
+    return arr.reduce(reduce, 0) 
+}
+
+function reduce(acc, i) {
+    return acc + allWagesFor(i)
+}       
+
